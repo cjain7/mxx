@@ -205,7 +205,7 @@ sample_block_decomp(_Iterator begin, _Iterator end, _Compare comp, int s, const 
     //         recursively and implement a base case for samplesort which does
     //         gather to rank=0, local sort and redistribute
     if (comm.rank() == 0) {
-        std::vector<value_type> all_samples(p*s);
+        std::vector<value_type> all_samples(comm.size()*s);
         MPI_Gather(&local_splitters[0], s, mpi_dt,
                    &all_samples[0], s, mpi_dt, 0, comm);
 
