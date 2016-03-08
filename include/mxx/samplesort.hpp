@@ -121,6 +121,14 @@ sample_arbit_decomp(_Iterator begin, _Iterator end, _Compare comp, int s, const 
         }
     }
 
+    //pick 100 equally spaced processes for sampling splitters
+    int pSampleRate = 1;
+
+    if(p > 100)
+      pSampleRate = p / 100;
+
+    comm.with_subset(comm.rank() % pSampleRate == 0, [&](const mxx::comm& comm){ 
+
     // 2. gather samples to `rank = 0`
     // - TODO: rather call sample sort
     //         recursively and implement a base case for samplesort which does
@@ -141,12 +149,14 @@ sample_arbit_decomp(_Iterator begin, _Iterator end, _Compare comp, int s, const 
         _Iterator pos = all_samples.begin();
         for (std::size_t i = 0; i < local_splitters.size(); ++i)
         {
-            std::size_t bucket_size = (p*s) / p + (i < static_cast<std::size_t>((p*s) % p) ? 1 : 0);
+            std::size_t bucket_size = (comm.size()*s) / p + (i < static_cast<std::size_t>((comm.size()*s) % p) ? 1 : 0);
             // pick last element of each bucket
             local_splitters[i] = *(pos + (bucket_size-1));
             pos += bucket_size;
         }
     }
+
+    });
 
     // size splitters for receiving
     if (local_splitters.size() != (size_t)p-1) {
@@ -182,6 +192,14 @@ sample_block_decomp(_Iterator begin, _Iterator end, _Compare comp, int s, const 
         ++pos;
     }
 
+    //pick 100 equally spaced processes for sampling splitters
+    int pSampleRate = 1;
+
+    if(p > 100)
+      pSampleRate = p / 100;
+
+    comm.with_subset(comm.rank() % pSampleRate == 0, [&](const mxx::comm& comm){ 
+
     // 2. gather samples to `rank = 0`
     // - TODO: rather call sample sort
     //         recursively and implement a base case for samplesort which does
@@ -202,7 +220,7 @@ sample_block_decomp(_Iterator begin, _Iterator end, _Compare comp, int s, const 
         _Iterator pos = all_samples.begin();
         for (std::size_t i = 0; i < local_splitters.size(); ++i)
         {
-            std::size_t bucket_size = (p*s) / p + (i < static_cast<std::size_t>((p*s) % p) ? 1 : 0);
+            std::size_t bucket_size = (comm.size()*s) / p + (i < static_cast<std::size_t>((comm.size()*s) % p) ? 1 : 0);
             // pick last element of each bucket
             local_splitters[i] = *(pos + (bucket_size-1));
             pos += bucket_size;
@@ -212,11 +230,13 @@ sample_block_decomp(_Iterator begin, _Iterator end, _Compare comp, int s, const 
     {
         // simply send
         MPI_Gather(&local_splitters[0], s, mpi_dt, NULL, 0, mpi_dt, 0, comm);
+    }
 
-        // resize splitters for receiving
-        if (local_splitters.size() != (size_t) p-1) {
-            local_splitters.resize(p-1);
-        }
+    });
+
+    // resize splitters for receiving
+    if (local_splitters.size() != (size_t) p-1) {
+      local_splitters.resize(p-1);
     }
 
     // 4. broadcast and receive final splitters
