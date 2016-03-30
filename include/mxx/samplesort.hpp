@@ -44,7 +44,13 @@
 #endif
 
 
+
+#ifdef BENCHMARK_CONN
+#define SS_ENABLE_TIMER 1
+#else
 #define SS_ENABLE_TIMER 0
+#endif
+
 #if SS_ENABLE_TIMER
 #include "timer.hpp"
 #define SS_TIMER_START(comm) mxx::section_timer timer(std::cerr, comm, 0);
