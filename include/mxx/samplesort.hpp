@@ -129,7 +129,7 @@ sample_arbit_decomp(_Iterator begin, _Iterator end, _Compare comp, int s, const 
 
     int pSampleRate = 1;
 
-    //If p > 500, pick only 100 processes for sampling
+    //If p > 100, pick only 100 processes for sampling
     if(p > 100)
       pSampleRate = p/100;
 
@@ -204,7 +204,7 @@ sample_block_decomp(_Iterator begin, _Iterator end, _Compare comp, int s, const 
 
     int pSampleRate = 1;
 
-    //If p > 500, pick only 100 processes for sampling
+    //If p > 100, pick only 100 processes for sampling
     if(p > 100)
       pSampleRate = p/100;
 
