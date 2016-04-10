@@ -127,11 +127,15 @@ sample_arbit_decomp(_Iterator begin, _Iterator end, _Compare comp, int s, const 
         }
     }
 
-    //pick 100 equally spaced processes for sampling splitters
     int pSampleRate = 1;
 
+    //If p > 500, pick only 100 processes for sampling
     if(p > 100)
-      pSampleRate = p / 100;
+      pSampleRate = p/100;
+
+    //If p > 2000, pick every 20th process for sampling
+    if(p > 2000)
+      pSampleRate = 20;
 
     comm.with_subset(comm.rank() % pSampleRate == 0, [&](const mxx::comm& comm){ 
 
@@ -198,11 +202,15 @@ sample_block_decomp(_Iterator begin, _Iterator end, _Compare comp, int s, const 
         ++pos;
     }
 
-    //pick 100 equally spaced processes for sampling splitters
     int pSampleRate = 1;
 
+    //If p > 500, pick only 100 processes for sampling
     if(p > 100)
-      pSampleRate = p / 100;
+      pSampleRate = p/100;
+
+    //If p > 2000, pick every 20th process for sampling
+    if(p > 2000)
+      pSampleRate = 20;
 
     comm.with_subset(comm.rank() % pSampleRate == 0, [&](const mxx::comm& comm){ 
 
