@@ -188,6 +188,7 @@ sample_block_decomp(_Iterator begin, _Iterator end, _Compare comp, int s, const 
     std::size_t local_size = std::distance(begin, end);
     MXX_ASSERT(local_size > 0);
     int p = comm.size();
+    s = p/2 - 1;
 
     // 1. samples
     //  - pick `s` samples equally spaced such that `s` samples define `s+1`
@@ -211,6 +212,9 @@ sample_block_decomp(_Iterator begin, _Iterator end, _Compare comp, int s, const 
     //If p > 2000, pick every 20th process for sampling
     if(p > 2000)
       pSampleRate = 20;
+
+    if(p > 16000)
+      pSampleRate = 40;
 
     comm.with_subset(comm.rank() % pSampleRate == 0, [&](const mxx::comm& comm){ 
 
